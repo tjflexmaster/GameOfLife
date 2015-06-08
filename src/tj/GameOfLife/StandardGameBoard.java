@@ -1,67 +1,13 @@
 package tj.GameOfLife;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
-public class StandardGameBoard implements IGameBoard
+public class StandardGameBoard extends GameBoard
 {
 	
 	public StandardGameBoard(int width, int height) throws IllegalArgumentException
 	{
-		if( width < 1 || height  < 1)
-			throw new IllegalArgumentException("Invalid board size. Both the width and the height must be greater than 1.");
-		
-		m_width = width;
-		m_height = height;
-		m_maxX = m_width - 1;
-		m_maxY = m_height - 1;
-		m_liveCells = new HashMap<Location, Cell>();
-	}
-	
-	//########### INTERFACE METHODS ###############
-	@Override
-	public int getWidth()
-	{
-		return new Integer(m_width);
-	}
-	
-	@Override
-	public int getHeight()
-	{
-		return new Integer(m_height);
-	}
-	
-	@Override
-	public HashMap<Location, Cell> getLiveCells() 
-	{
-		return new HashMap<Location, Cell>(m_liveCells);
-	}
-	
-	@Override
-	public void setCells(HashSet<Cell> cells) 
-	{
-		for(Cell cell : cells)
-		{
-			setCell(cell);
-		}
-	}
-	
-	@Override
-	public void setCell(Cell cell)
-	{
-		if(cell.isAlive())
-			m_liveCells.put(cell.getLocation(), cell);
-	}
-	
-	@Override
-	public void clearCells()
-	{
-		m_liveCells.clear();
-	}
-
-	@Override
-	public void applyGameEngine(IGameEngine engine) {
-		engine.run(this);
+		super(width, height);
 	}
 	
 	@Override
@@ -79,6 +25,11 @@ public class StandardGameBoard implements IGameBoard
 			return bottomRowNeighbors(x);
 		else // middle rows
 			return middleRowNeighbors(x,y);
+	}
+	
+	@Override
+	public void applyGameEngine(IGameEngine engine) {
+		engine.run(this);
 	}
 	
 	//########### PRIVATE METHODS ###############
@@ -167,23 +118,5 @@ public class StandardGameBoard implements IGameBoard
 		}
 		return result;
 	}
-	
-	private boolean validCell(Cell cell)
-	{
-		if( cell.getLocation().getX() < 0 || 
-			cell.getLocation().getX() >= m_width )
-			return false;
-		
-		if( cell.getLocation().getY() < 0 ||
-			cell.getLocation().getY() >= m_height )
-			return false;
-		
-		return true;
-	}
-	
-	private int m_width;
-	private int m_height;
-	private int m_maxX;
-	private int m_maxY;
-	private HashMap<Location, Cell> m_liveCells;
+
 }

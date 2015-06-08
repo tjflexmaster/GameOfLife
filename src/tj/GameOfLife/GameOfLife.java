@@ -34,7 +34,25 @@ public class GameOfLife {
 				System.out.println(cell.toString());
 			}
 		}
+		
+		System.out.println("Using Wrap Around Game Board");
 
+		WrapAroundGameBoard board2 = new WrapAroundGameBoard(5,5);
+		board2.setCell(new Cell(new Location(2,1), CellState.Live));
+		board2.setCell(new Cell(new Location(2,2), CellState.Live));
+		board2.setCell(new Cell(new Location(2,3), CellState.Live));
+		
+		for(int i=0; i < 5; i++)
+		{
+			board2.applyGameEngine(engine);
+			
+			HashMap<Location, Cell> liveCells = board2.getLiveCells();
+			for(HashMap.Entry<Location,Cell> entry : liveCells.entrySet())
+			{
+				Cell cell = entry.getValue();
+				System.out.println(cell.toString());
+			}
+		}
 	}
 
 }

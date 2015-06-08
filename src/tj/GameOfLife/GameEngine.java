@@ -29,16 +29,28 @@ class MutableInt {
 
 
 public class GameEngine implements IGameEngine {
-
+	
 	@Override
-	public void run(StandardGameBoard board) {
+	public void run(IGameBoard board) 
+	{	
+		// Reset any stored values
+		reset();
 		
 		// Get the Live Cells
 		HashMap<Location, Cell> liveCells = board.getLiveCells();
 		
-		// Create map to count the neighbor hits
-		HashMap<Location, MutableInt> neighborCounts = new HashMap<Location, MutableInt>();
+		// Count how many times each cell is touched by a live neighbor
+		getNeighborCount(board, liveCells);
 		
+		// Clear the GameBoard
+		board.clearCells();
+		
+		// Set the cleared board to show live cells
+		updateGameBoard(board, liveCells);
+	}
+	
+	private void getNeighborCount(IGameBoard board, HashMap<Location, Cell> liveCells)
+	{
 		// Count up the live neighbors for each cell touching a live cell
 		for(HashMap.Entry<Location,Cell> entry : liveCells.entrySet())
 		{
@@ -48,16 +60,16 @@ public class GameEngine implements IGameEngine {
 				HashSet<Location> neighborLocations = board.getCellNeighborLocations(cell);
 				for(Location location : neighborLocations)
 				{
-					MutableInt count = neighborCounts.get(location);
+					MutableInt count = m_neighborCounts.get(location);
 					if(count == null)
 					{
-						neighborCounts.put(location, new MutableInt(1));
-//						System.out.println("Added " + location.toString());
+						m_neighborCounts.put(location, new MutableInt(1));
+//								System.out.println("Added " + location.toString());
 					}
 					else
 					{
 						count.increment();
-//						System.out.println("Incremented " + location.toString() + " Count=" + Integer.toString(count.get()));
+//								System.out.println("Incremented " + location.toString() + " Count=" + Integer.toString(count.get()));
 					}
 				}
 			}
@@ -67,12 +79,12 @@ public class GameEngine implements IGameEngine {
 				System.out.println("Cell: " + cell.getLocation().toString());
 			}
 		}
-		
-		// Clear the GameBoard
-		board.clearCells();
-		
+	}
+	
+	private void updateGameBoard(IGameBoard board, HashMap<Location, Cell> liveCells)
+	{
 		// Check if the cell is now live, if so then update the game board
-		for (HashMap.Entry<Location, MutableInt> entry : neighborCounts.entrySet()) 
+		for (HashMap.Entry<Location, MutableInt> entry : m_neighborCounts.entrySet()) 
 		{
 			Cell cell = liveCells.get(entry.getKey());
 			int liveNeighborCount = entry.getValue().get();
@@ -84,9 +96,7 @@ public class GameEngine implements IGameEngine {
 			else
 			{
 				if( doesDeadCellLive(liveNeighborCount) )
-				{
 					board.setCell(new Cell(entry.getKey(), CellState.Live));
-				}
 			}
 		}
 	}
@@ -112,5 +122,15 @@ public class GameEngine implements IGameEngine {
 		
 		return false;
 	}
+	
+	private void reset()
+	{
+		m_neighborCounts.clear();
+	}
 
+
+	/** Stores a map of that counts the number of live cells touching cells
+	 * 	that border live cells.
+	 */
+	private HashMap<Location, MutableInt> m_neighborCounts = new HashMap<Location, MutableInt>();
 }
