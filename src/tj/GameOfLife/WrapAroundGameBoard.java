@@ -1,46 +1,44 @@
 package tj.GameOfLife;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class WrapAroundGameBoard extends GameBoard 
 {
-
+	
 	public WrapAroundGameBoard(int width, int height) throws IllegalArgumentException
 	{
 		super(width, height);
 	}
-	
+
 	@Override
-	public HashSet<Location> getCellNeighborLocations(Cell cell) throws IllegalArgumentException 
+	public void getCellNeighborLocations(GridCell cell,
+			Set<GridLocation> outputSet) throws IllegalArgumentException 
 	{
 		if( !validCell(cell) )
 			throw new IllegalArgumentException("Invalid cell location.  Cell must be found on the game board.");
 		
-		int x = cell.getLocation().getX();
-		int y = cell.getLocation().getY();
-		int xLess = (x == 0) ? m_maxX : x-1;
-		int xMore = (x == m_maxX) ? 0 : x+1;
-		int yLess = (y == 0) ? m_maxY : y-1;
-		int yMore = (y == m_maxY) ? 0 : y+1; 
+		int row = cell.getLocation().getRow();
+		int column = cell.getLocation().getColumn();
+		int topNeighborRow = (row == topRow) ? bottomRow : row - 1;
+		int bottomNeighborRow = (row == bottomRow) ? topRow : row + 1;
+		int leftNeighborColumn = (column == leftColumn) ? rightColumn : column - 1;
+		int rightNeighborColumn = (column == rightColumn) ? leftColumn : column + 1; 
 		
-		HashSet<Location> result = new HashSet<Location>();
+		outputSet.add(new GridLocation(topNeighborRow, leftNeighborColumn));
+		outputSet.add(new GridLocation(topNeighborRow, column));
+		outputSet.add(new GridLocation(topNeighborRow, rightNeighborColumn));
+		outputSet.add(new GridLocation(row, leftNeighborColumn));
+		outputSet.add(new GridLocation(row, rightNeighborColumn));
+		outputSet.add(new GridLocation(bottomNeighborRow, leftNeighborColumn));
+		outputSet.add(new GridLocation(bottomNeighborRow, column));
+		outputSet.add(new GridLocation(bottomNeighborRow, rightNeighborColumn));
 		
-		result.add(new Location(xLess, yLess));
-		result.add(new Location(xLess, y));
-		result.add(new Location(xLess, yMore));
-		result.add(new Location(x, yLess));
-		result.add(new Location(x, yMore));
-		result.add(new Location(xMore, yLess));
-		result.add(new Location(xMore, y));
-		result.add(new Location(xMore, yMore));
-		
-		return result;
 	}
-	
+
 	@Override
-	public void applyGameEngine(IGameEngine engine) 
+	public void applyVisitor(IGameBoardVisitor visitor) 
 	{
-		engine.run(this);
+		visitor.visit(this);
 	}
 
 }

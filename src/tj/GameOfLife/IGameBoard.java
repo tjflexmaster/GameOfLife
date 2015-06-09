@@ -1,18 +1,25 @@
 package tj.GameOfLife;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public interface IGameBoard {
 	
-	public int getWidth();
-	public int getHeight();
+	public Integer getWidth();
+	public Integer getHeight();
 	
-	public HashMap<Location, Cell> getLiveCells();
-	public void setCells(HashSet<Cell> cells);
-	public void setCell(Cell cell);
+	public void getLiveCells(Map<GridLocation, GridCell> outputMap);
+	
+	public void setCells(Set<GridCell> cells);
+	
+	public void setCells(GridCell[] cells);
+	
+	public void setCell(GridCell cell);
+	
 	public void clearCells();
-	public HashSet<Location> getCellNeighborLocations(Cell cell) throws IllegalArgumentException;
 	
-	public void applyGameEngine(IGameEngine engine);
+	public void getCellNeighborLocations(GridCell cell, Set<GridLocation> outputSet) 
+			throws IllegalArgumentException;
+	
+	public void applyVisitor(IGameBoardVisitor visitor);
 }

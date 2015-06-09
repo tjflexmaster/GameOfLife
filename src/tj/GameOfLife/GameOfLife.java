@@ -1,58 +1,63 @@
 package tj.GameOfLife;
 
 import java.util.HashMap;
+import java.util.Map;
 
-import tj.GameOfLife.Cell.CellState;
+import tj.GameOfLife.GridCell.CellState;
 
 public class GameOfLife {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("Running the Game of Life");
+		final int defaultRowCount = 5;
+		final int defaultColumnCount = 5;
 		
-		GameEngine engine = new GameEngine();
+		final int defaultGameEngineStepCount = 5;
 		
-//		StandardGameBoard board = new StandardGameBoard(4,4);
-//		board.setCell(new Cell(new Location(1,1), CellState.Live));
-//		board.setCell(new Cell(new Location(1,2), CellState.Live));
-//		board.setCell(new Cell(new Location(2,1), CellState.Live));
-//		board.setCell(new Cell(new Location(2,2), CellState.Live));
+		GridCell[] lineSeed = {
+			new GridCell(2, 1, CellState.Live),
+			new GridCell(2, 2, CellState.Live),
+			new GridCell(2, 3, CellState.Live)
+		};
 		
-		StandardGameBoard board = new StandardGameBoard(5,5);
-		board.setCell(new Cell(new Location(2,1), CellState.Live));
-		board.setCell(new Cell(new Location(2,2), CellState.Live));
-		board.setCell(new Cell(new Location(2,3), CellState.Live));
+		SingleStepGameEngine singleStepEngine = new SingleStepGameEngine();
+		MultiStepGameEngine multiStepEngine = new MultiStepGameEngine(defaultGameEngineStepCount);
+		HashMap<GridLocation, GridCell> liveCells = new HashMap<GridLocation, GridCell>();
 		
-		for(int i=0; i < 5; i++)
-		{
-			board.applyGameEngine(engine);
-			
-			HashMap<Location, Cell> liveCells = board.getLiveCells();
-			for(HashMap.Entry<Location,Cell> entry : liveCells.entrySet())
-			{
-				Cell cell = entry.getValue();
-				System.out.println(cell.toString());
-			}
-		}
+		System.out.println("Using Standard Game Board");
 		
-		System.out.println("Using Wrap Around Game Board");
-
-		WrapAroundGameBoard board2 = new WrapAroundGameBoard(5,5);
-		board2.setCell(new Cell(new Location(2,1), CellState.Live));
-		board2.setCell(new Cell(new Location(2,2), CellState.Live));
-		board2.setCell(new Cell(new Location(2,3), CellState.Live));
+		StandardGameBoard standardBoard = new StandardGameBoard(defaultRowCount, defaultColumnCount);
+		standardBoard.setCells(lineSeed);
+		standardBoard.getLiveCells(liveCells);
+		printLiveCells(liveCells);
 		
-		for(int i=0; i < 5; i++)
-		{
-			board2.applyGameEngine(engine);
-			
-			HashMap<Location, Cell> liveCells = board2.getLiveCells();
-			for(HashMap.Entry<Location,Cell> entry : liveCells.entrySet())
-			{
-				Cell cell = entry.getValue();
-				System.out.println(cell.toString());
-			}
-		}
+		liveCells.clear();
+		standardBoard.applyVisitor(singleStepEngine);
+		standardBoard.getLiveCells(liveCells);
+		printLiveCells(liveCells);
+		
+		liveCells.clear();
+		standardBoard.applyVisitor(singleStepEngine);
+		standardBoard.getLiveCells(liveCells);
+		printLiveCells(liveCells);
+		
+		
+//		System.out.println("Using Wrap Around Game Board");
+//		liveCells.clear();
+//
+//		WrapAroundGameBoard wrapAroundBoard = new WrapAroundGameBoard(defaultRowCount, defaultColumnCount);
+//		wrapAroundBoard.setCells(lineSeed);
+//		wrapAroundBoard.applyVisitor(multiStepEngine);
+//		standardBoard.getLiveCells(liveCells);
+//		
+//		printLiveCells(liveCells);
 	}
 
+	private static void printLiveCells(Map<GridLocation, GridCell> liveCells)
+	{
+		for(Map.Entry<GridLocation,GridCell> entry : liveCells.entrySet())
+		{
+			System.out.println(entry.getValue().toString());
+		}
+	}
 }
